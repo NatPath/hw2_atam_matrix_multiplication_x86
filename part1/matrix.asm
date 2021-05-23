@@ -7,13 +7,13 @@ get_elemnt_from_matrix:
 	pushq %rbp
 	movq %rsp, %rbp
 	# %rdi is pointer to the matrix
-	# %rsi is n - number of cols
-	# %rdx is row
-	# %rcx is col
+	# %esi is n - number of cols
+	# %edx is row
+	# %ecx is col
 	mov %rsi, %rax
-	mov %rdx, %r8 # backup %rdx which will be writen over in mul
-	mul %rdx # how many "elements" we need to pass to get to the row
-	sal $2, %rcx # multiply by 4, for the sizeof(int) in bytes
+	mov %edx, %r8d # backup %rdx which will be writen over in mul
+	mul %edx # how many "elements" we need to pass to get to the row
+	sal $2, %ecx # multiply by 4, for the sizeof(int) in bytes
 	lea (%rdi, %rax, 4), %rax
 	mov (%rax,%rcx,1), %eax
 
@@ -26,28 +26,28 @@ get_elemnt_from_matrix:
 	*/
 # gets an integer n , and a prime number p 
 # returns n%p
-# %rdi = n , %rsi = p
+# %edi = n , %esi = p
 modP:
 	pushq %rbp
 	movq %rsp , %rbp
 	xor %rdx , %rdx
-	mov  %rdi , %rax
-	div %rsi
+	mov  %edi , %eax
+	div %esi
 	# rdx now contains the remainder and thus our answer
-	mov %rdx,%rax
+	mov %edx,%eax
 
 	leaveq
 	retq
 # gets a matrix mod p all of its elements
 # %rdi - matrix
-# %rsi - number of elements
-# %rdx - p
+# %esi - number of elements
+# %edx - p
 modPmatrix:
 	pushq %rbp
 	movq %rsp, %rbp
 
-	xor %r10,%r10 # i=0
-	cmp %r10, %rsi
+	xor %r10d,%r10d # i=0
+	cmp %r10d, %esi
 	je endloopModP
 loopModP:
 	pushq %rdi
@@ -55,7 +55,7 @@ loopModP:
 	pushq %rdx
 	pushq %r10
 	mov (%rdi,%r10,4),%rdi
-	mov %rdx, %rsi
+	mov %edx, %esi
 	call modP
 	pop %r10
 	pop %rdx
@@ -63,8 +63,8 @@ loopModP:
 	pop %rdi
 	mov %eax,(%rdi,%r10,4)
 
-	inc %r10
-	cmp %r10, %rdx
+	inc %r10d
+	cmp %r10d, %esi
 	jne loopModP
 endloopModP:
 	leaveq
@@ -288,10 +288,11 @@ loopMatMat:
 	jne loopMatMat
 endloopMatMat:
 
+	mov %rdx, %rdi
 	mov %rcx, %rax
 	mul %r9
 	mov %rax, %rsi
-	mov 16(%rbp), %rdx
+	mov 16(%rbp), %edx
 	call modPmatrix
 	movq (%rsp), %r12
 	movq 8(%rsp), %r13
